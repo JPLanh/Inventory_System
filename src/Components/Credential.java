@@ -1,6 +1,6 @@
 package Components;
 
-public class Credential {
+public class Credential implements Comparable<Credential> {
 
 	private String username, password, type;
 
@@ -32,6 +32,18 @@ public class Credential {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+
+	@Override
+	public boolean equals(Object o) {
+		return (((Credential) o).getUsername()).equals(this.getUsername());
+	}
+
+	@Override
+	public int compareTo(Credential o) {
+//		System.out.println(this.itemName.compareTo(o.getItemName()));
+		return this.username.compareTo(o.getUsername());
 	}
 	
 }

@@ -105,22 +105,6 @@ public class Label extends JPanel implements UIComponent{
 		return name;
 	}
 
-	@Override
-	public boolean isClickedOn(int mouseX, int mouseY)
-	{ 
-		if (mouseX < highX && mouseX > lowX && mouseY < highY && mouseY > lowY)	return true;
-		else return false;
-	}
-
-	@Override
-	public String clickAction() {
-		return null;
-	}
-	@Override
-	public boolean isActive() {
-		return false;
-	}
-
 	public int getLifeSpan() {
 		return lifeSpan;
 	}

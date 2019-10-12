@@ -8,9 +8,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
+import Components.Credential;
+import Components.Metadata;
 import Components.UIFrame;
 
 public class GUIController extends JPanel implements MouseListener{
@@ -25,7 +28,9 @@ public class GUIController extends JPanel implements MouseListener{
 	public GUIController(){
 		addMouseListener(this);
 		setBackground(new Color(8, 81, 0));
-		currentFrame = new LoginUI();
+		
+		if (checkCred()) currentFrame = new LoginUI();
+		else currentFrame = new TechConsoleUI();
 
 		new Timer(500, new ActionListener() {
 			@Override
@@ -89,6 +94,13 @@ public class GUIController extends JPanel implements MouseListener{
 	public void mouseReleased(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 
+	}
+	
+
+	private boolean checkCred() {
+		ArrayList<Credential> credSet = Metadata.getCredentials();
+		if (credSet == null || credSet.size() == 0) return false;
+		else return true;
 	}
 	
 	public void keyPress(KeyEvent event) {

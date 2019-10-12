@@ -2,11 +2,12 @@ package Components;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JPanel;
 
 
-public class LabelLink extends JPanel implements UIComponent{
+public class LabelLink extends JPanel implements UIComponent, InputInterface{
 	/**
 	 * 
 	 */
@@ -14,7 +15,7 @@ public class LabelLink extends JPanel implements UIComponent{
 	private int xPos, yPos, width, height;
 	private int lowX, highX, lowY, highY;
 	private String name, string, action = "";
-	private boolean hidden = false;
+	private boolean hidden = false, focus = false;;
 
 	public LabelLink(String getName, int getXPos, int getYPos, int getWidth, int getHeight, String getString)
 	{
@@ -74,10 +75,6 @@ public class LabelLink extends JPanel implements UIComponent{
 	public String clickAction() {
 		return action;
 	}
-	@Override
-	public boolean isActive() {
-		return false;
-	}
 	
 	@Override
 	public int getXPos() {
@@ -87,5 +84,20 @@ public class LabelLink extends JPanel implements UIComponent{
 	@Override
 	public int getYPos() {
 		return yPos;
+	}
+
+	@Override
+	public boolean isFocus() {
+		return focus;
+	}
+
+	@Override
+	public void getFocus(boolean getFocus) {
+		focus = getFocus;
+	}
+
+	@Override
+	public String keyPress(KeyEvent c) {
+		return null;
 	}
 }

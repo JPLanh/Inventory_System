@@ -3,11 +3,12 @@ package Components;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JPanel;
 
 
-public class Button extends JPanel implements UIComponent{
+public class Button extends JPanel implements UIComponent, InputInterface{
 	/**
 	 * 
 	 */
@@ -16,7 +17,7 @@ public class Button extends JPanel implements UIComponent{
 	private int lowX, highX, lowY, highY;
 	private String name, string, action = "";
 	private Color fontColor = Color.WHITE, bkColor = new Color(8, 81, 0);//(188, 201, 155);
-	private boolean hidden = false;
+	private boolean hidden = false, focus = false;
 
 	public Button(String getName, int getXPos, int getYPos, int getWidth, int getHeight, String getString, String getAction, Color getBKColor, Color getFontColor, int getSize)
 	{
@@ -118,11 +119,8 @@ public class Button extends JPanel implements UIComponent{
 
 	@Override
 	public String clickAction() {
+		
 		return action;
-	}
-	@Override
-	public boolean isActive() {
-		return false;
 	}
 
 	@Override
@@ -133,5 +131,21 @@ public class Button extends JPanel implements UIComponent{
 	@Override
 	public int getYPos() {
 		return yPos;
+	}
+	
+	public boolean isFocus() {
+		return focus;
+	}
+
+	@Override
+	public void getFocus(boolean getFocus) {
+		focus = getFocus;
+		
+	}
+
+	@Override
+	public String keyPress(KeyEvent c) {
+		if (c.getKeyCode() == 10) return action;
+		return null;
 	}
 }

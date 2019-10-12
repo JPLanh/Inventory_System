@@ -41,38 +41,44 @@ public class barcode {
 		if (!sort) itemList = Metadata.readItemMeta();
 		else itemList = Metadata.sortItem("Name");
 		new File("resource").mkdir();
-		System.out.println(path + " , " + "resource/");
+		BitmapCanvasProvider canvas = null;
+		OutputStream out = null;
 		for (Item x : itemList) {
-			for (int i = 0; i < 2; i++) {
-				String modifier;
-				if (i == 0) modifier = "add";
-				else modifier = "minus";
-				File outputFile = new File("resource/" + modifier + "_" + x.getId() + ".png");
-				OutputStream out = null;
 				try {
-					out = new FileOutputStream(outputFile);
-					BitmapCanvasProvider canvas = new BitmapCanvasProvider(
-							out, "image/x-png", dpi, BufferedImage.TYPE_BYTE_BINARY, false, 0);
-
+					System.out.println(x.getItemName() + " compiled");
+					//Add
+					out = new FileOutputStream(new File("resource/" + "add_" + x.getId() + ".png"));
+					canvas = new BitmapCanvasProvider(out, "image/x-png", dpi, BufferedImage.TYPE_BYTE_BINARY, false, 0);
 					bean.setMsgPosition(HumanReadablePlacement.HRP_NONE);
-					bean.generateBarcode(canvas, getHash(modifier + " " + Integer.toString(x.getId())));
+					bean.generateBarcode(canvas, x.getAddHex());
 					canvas.finish();
-//					System.out.println(modifier + "_" + x.getId() + " : " + getHash(modifier + " " + Integer.toString(x.getId())));
+					out.close();
+					
+					//Minus
+					out = new FileOutputStream(new File("resource/" + "minus_" + x.getId() + ".png"));
+					canvas = new BitmapCanvasProvider(out, "image/x-png", dpi, BufferedImage.TYPE_BYTE_BINARY, false, 0);
+					bean.setMsgPosition(HumanReadablePlacement.HRP_NONE);
+					bean.generateBarcode(canvas, x.getMinusHex());
+					canvas.finish();
+					out.close();
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.out.println("File not found");
+//					e.printStackTrace();
 
 				} catch (IOException e) {
+					System.out.println("IO EXception 1");
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+//					e.printStackTrace();
 				} finally {
-					try {
-						out.close();
-					} catch (IOException e) {
+//					try {
+//						out.close();
+//						canvas.finish();
+//					} catch (IOException e) {
+//						System.out.println("IO EXception 2");
 						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
+//						e.printStackTrace();
+//				}
 			}	       
 		}
 	}
@@ -134,6 +140,7 @@ public class barcode {
 		if(Metadata.getConfig() != null) path = Metadata.getConfig().get("Dir");
 		try {
 			for (Item x: itemList) {
+				System.out.println(x.getItemName());
 				image1 = ImageIO.read(new File("resource/" + "add_"+x.getId()+".png"));
 				BufferedImage img1 = resize(image1, (int)(image1.getWidth()*.75), (int)(image1.getHeight()*.75));
 				image2 = ImageIO.read(new File("resource/" + "minus_"+x.getId()+".png"));

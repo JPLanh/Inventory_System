@@ -9,21 +9,19 @@ import Components.*;
 
 public class LoginUI implements UIFrame{
 
-	private static String staffUserPass = "staff";
-	private static String adminUserPass = "admin";
-	private static String techUserPass = "tech";
 	GUIList frameComponents = new GUIList();
 
 	LoginUI(){
+		//		Metadata.formatList();
 		refreshFrame();
 	}
 
 	private void refreshFrame() {
 		frameComponents.add(new Shape("SQUARE", Color.WHITE, 25, 25, 725, 500, true));
 		frameComponents.add(new Label("Login", 350, 150, "Login"));
-		frameComponents.add(new TextField("Username", 300, 180, "Username"));
-		frameComponents.add(new TextField("Password", 300, 220, "Password"));
-		frameComponents.add(new Button("Login", 300, 260, 150, 30, "LOGIN", "Click Login User"));
+		frameComponents.add(new TextField("Username", 300, 180, "Username", 150, false));
+		frameComponents.add(new TextField("Password", 300, 220, "Password", 150, false));
+		frameComponents.add(new Button("Login Button", 300, 260, 150, 30, "LOGIN", "Click Login User"));
 		frameComponents.setFocus("Username");
 	}
 	@Override
@@ -44,45 +42,35 @@ public class LoginUI implements UIFrame{
 	}
 
 	private String action(String getAction) {
-		if (getAction != null) {
-			if (getAction.equals("Click Login User")) {
-				ArrayList<Credential> credSet = Metadata.getCredentials();
-				if (credSet != null) {
-					boolean staff = false, admin = false, tech = false;
-					for (Credential i : credSet) {
-						if (i.getType().equals("Staff")) staff = true;
-						if (i.getType().equals("Admin")) admin = true;
-						if (i.getType().equals("Tech")) tech = true;
-
-						if (((TextField)frameComponents.get("Username")).getString().equals(i.getUsername()) && ((TextField)frameComponents.get("Password")).getString().equals(i.getPassword())) {
-							return "Goto " + i.getType() + " Console";
-						}						
-					}
-					if (!staff)
-						if (((TextField)frameComponents.get("Username")).getString().equals(staffUserPass) && ((TextField)frameComponents.get("Password")).getString().equals(staffUserPass)) {
-							return "Goto Staff Console";
-						}
-					if (!admin)
-						if (((TextField)frameComponents.get("Username")).getString().equals(adminUserPass) && ((TextField)frameComponents.get("Password")).getString().equals(adminUserPass)) {
-							return "Goto Admin Console";
-						}
-					if (!tech)
-						if (((TextField)frameComponents.get("Username")).getString().equals(techUserPass) && ((TextField)frameComponents.get("Password")).getString().equals(techUserPass)) {
-							return "Goto Tech Console";
-						}					
-				} else {
-					if (((TextField)frameComponents.get("Username")).getString().equals(staffUserPass) && ((TextField)frameComponents.get("Password")).getString().equals(staffUserPass)) {
-						return "Goto Staff Console";
-					} else if (((TextField)frameComponents.get("Username")).getString().equals(adminUserPass) && ((TextField)frameComponents.get("Password")).getString().equals(adminUserPass)) {
-						return "Goto Admin Console";
-					} else if (((TextField)frameComponents.get("Username")).getString().equals(techUserPass) && ((TextField)frameComponents.get("Password")).getString().equals(techUserPass)) {
-						return "Goto Tech Console";
-					}					
+		if (frameComponents.getAlert() != null) {
+			if (frameComponents.getAlertCmd().equals("Invalid credential")){
+				if (getAction.equals("Ok")) {
+					frameComponents = new GUIList();
+					refreshFrame();
 				}
-				return getAction;
 			}
+			return null;
+		} else {
+			if (getAction != null) {
+				if (getAction.equals("Click Login User")) {
+					ArrayList<Credential> credSet = Metadata.getCredentials();
+
+					//If credential has already been set
+					if (credSet != null) {
+						for (Credential i : credSet) {
+
+							if (((TextField)frameComponents.get("Username")).getString().equals(i.getUsername()) && ((TextField)frameComponents.get("Password")).getString().equals(i.getPassword())) {
+								return "Goto " + i.getType() + " Console";
+							}						
+						}
+						frameComponents.alertUser("Invalid credential", 200, 300, "Invalid username or password", "Invalid credential", "confirm");
+		
+					}
+					return getAction;
+				}
+			}
+			return null;
 		}
-		return null;
 	}
 
 	@Override

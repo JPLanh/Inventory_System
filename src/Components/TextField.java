@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-public class TextField extends JPanel implements UIComponent{
+public class TextField extends JPanel implements UIComponent, InputInterface{
 
 	/**
 	 * 
@@ -18,9 +18,9 @@ public class TextField extends JPanel implements UIComponent{
 	private int lowX, highX, lowY, highY, counter;
 	private String name, string = "";
 	private ArrayList<String> text = new ArrayList<String>();
-	private boolean hidden = false, active = false, flag = false;
+	private boolean editable = false, multiline = false, focus = false;
 
-	public TextField(String getName, int getXPos, int getYPos, String setString)
+	public TextField(String getName, int getXPos, int getYPos, String setString, boolean getEditable)
 	{
 		name = getName;
 		xPos = getXPos;
@@ -32,9 +32,10 @@ public class TextField extends JPanel implements UIComponent{
 		lowY = yPos;
 		highY = yPos+height;
 		string = setString;
+		editable = getEditable;
 	}
 
-	public TextField(String getName, int getXPos, int getYPos, String setString, int textLength)
+	public TextField(String getName, int getXPos, int getYPos, String setString, int textLength, boolean muli)
 	{
 		name = getName;
 		xPos = getXPos;
@@ -46,12 +47,12 @@ public class TextField extends JPanel implements UIComponent{
 		lowY = yPos;
 		highY = yPos+height;
 		string = setString;
+		multiline = muli;
 	}
 
-	public TextField(String getName, int getXPos, int getYPos, String setString, int getLength, int getHeight, boolean flag)
+	public TextField(String getName, int getXPos, int getYPos, String setString, int getLength, int getHeight)
 	{
 		name = getName;
-		this.flag = flag;
 		xPos = getXPos;
 		yPos = getYPos;
 		width = getLength;
@@ -95,24 +96,39 @@ public class TextField extends JPanel implements UIComponent{
 		return name;
 	}
 
-	public void keyPress(KeyEvent c)
+	public String keyPress(KeyEvent c)
 	{
-		if (c.getExtendedKeyCode() == KeyEvent.VK_BACK_SPACE) {
-			if (string.length() > 1) string = string.substring(0, string.length()-2) + "|";
-			else {
-				if (text.size()>0) string = text.remove(text.size()-1) + "|";
-			}
-		} else {
-			if (c.getKeyCode() == 10) {
-				text.add(string.substring(0,string.length()-1));
-				string = "|";
-			}
-			else if (c.getKeyCode() >= 32 && c.getKeyCode() <= 127) {
-				if (string.length() > 120) {
-					text.add(string.substring(0,string.length()-1)+c.getKeyChar());
-					string = "|";
-				} else {
-					string = string.substring(0,string.length()-1) + c.getKeyChar() + "|";
+		//If the text field is editable
+		if (!editable) {
+			//User press backspace
+			if (c.getExtendedKeyCode() == KeyEvent.VK_BACK_SPACE) 
+			{
+				//If a text exist in the text field
+				if (string.length() > 1) string = string.substring(0, string.length()-2) + "|";
+				else {
+					//If multiline was enabled
+					if (text.size()>0 && multiline) string = text.remove(text.size()-1) + "|";
+				}
+			} else 
+			{
+				//If user press enter
+				if (c.getKeyCode() == 10) {
+					//If multiline was exist while pressing enter
+					if (multiline)
+					{
+						text.add(string.substring(0,string.length()-1));
+						string = "|";
+					} else {
+						return "\n";
+					}
+				}
+				else if (c.getKeyCode() >= 32 && c.getKeyCode() <= 127) {
+					if (string.length() > 120) {
+						text.add(string.substring(0,string.length()-1)+c.getKeyChar());
+						string = "|";
+					} else {
+						string = string.substring(0,string.length()-1) + c.getKeyChar() + "|";
+					}
 				}
 			}
 		}
@@ -121,60 +137,38 @@ public class TextField extends JPanel implements UIComponent{
 		//		else if (Character.toString(c.getKeyChar()).matches("[a-zA-Z0-9@.\\s]")) {  
 		//				string = string.substring(0,string.length()-1) + c.getKeyChar() + "|";
 		//		}
+		return null;
 	}
 
 	@Override
 	public boolean isClickedOn(int mouseX, int mouseY)
 	{ 
 		if (mouseX < highX && mouseX > lowX && mouseY < highY && mouseY > lowY)	{
-			if (!active) {
-				if (string.equals(name)) string = "";
-				string += "|";
-				active = true;
-			}
+//			if (!active) {
+//				if (string.equals(name)) string = "";
+//				string += "|";
+//				active = true;
+//			}
 			return true;
 		}
 		else {
-			if (active)
-			{
-				string = string.substring(0,string.length()-1);
-				if (string.equals("")) {
-					string = name;
-				}
-			}
-			active = false;
+//			if (active)
+//			{
+//				string = string.substring(0,string.length()-1);
+//				if (string.equals("")) {
+//					string = name;
+//				}
+//			}
+//			active = false;
 			return false;		
 		}
 	}
 
-	public void activeToggle(boolean toggle) {
-		if (toggle) {
-			if (!active) {
-				if (string.equals(name)) string = "";
-				string += "|";
-			}
-			active = true;
-		} else {
-			if (isActive())
-			{
-				string = string.substring(0,string.length()-1);
-				if (string.equals("")) {
-					string = name;
-				}
-			}
-			active = false;		
-		}
-
-	}
-	@Override
+	@Override	
 	public String clickAction() {
 		return "Activate";
 	}
-	@Override
-	public boolean isActive() {
-		return active;
-	}
-	
+
 	@Override
 	public int getXPos() {
 		return xPos;
@@ -183,5 +177,23 @@ public class TextField extends JPanel implements UIComponent{
 	@Override
 	public int getYPos() {
 		return yPos;
+	}
+
+	@Override
+	public boolean isFocus() {
+		return focus;
+	}
+
+	@Override
+	public void getFocus(boolean getFocus) {
+		if (getFocus) {
+			if (string.equals(name)) string = "|";
+			else string += "|";
+		} else {
+			string = string.substring(0,string.length()-1);
+			if (string.equals("")) {
+				string = name;
+			}
+		}
 	}
 }

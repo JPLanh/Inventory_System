@@ -15,6 +15,8 @@ public class Item  implements Comparable<Item>{
 
 	private int amount;
 	private String hex;
+	private String addHex;
+	private String minusHex;
 	
 	public Item(JsonObject json){
 		amount = json.get("amount").getAsInt();
@@ -22,6 +24,8 @@ public class Item  implements Comparable<Item>{
 		itemName = json.get("item").getAsString();
 		description = json.get("description").getAsString();
 		modifier = json.get("modifier").getAsString();
+		addHex = json.get("addHex").getAsString();
+		minusHex = json.get("minusHex").getAsString();
 	}
 	
 	public String getModifier() {
@@ -36,6 +40,22 @@ public class Item  implements Comparable<Item>{
 		hex = getMD5;
 	}
 
+	public String getAddHex() {
+		return addHex;
+	}
+
+	public String getMinusHex() {
+		return minusHex;
+	}
+
+	public void setAddHex(String addHex) {
+		this.addHex = addHex;
+	}
+
+	public void setMinusHex(String minusHex) {
+		this.minusHex = minusHex;
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -47,6 +67,8 @@ public class Item  implements Comparable<Item>{
 	public Item(String name, String description){
 		itemName = name;
 		this.description = description;
+		this.addHex = barcode.getHash("add" + " " + name + " " + description);
+		this.minusHex = barcode.getHash("minus" + " " + name + " " + description);
 	}
 	
 	public String getItemName() {
@@ -102,9 +124,9 @@ public class Item  implements Comparable<Item>{
 	@Override
 	public boolean equals(Object o) {
 		return (((Item) o).getId() == this.getId()) 
-				|| (((Item) o).toString().equals(this.toString())) 
-				|| barcode.getHash("add " + Integer.toString(((Item)o).getId())).equals(this.getHex())
-				|| barcode.getHash("minus " + Integer.toString(((Item)o).getId())).equals(this.getHex());
+				|| (((Item) o).toString().equals(this.toString()))
+				|| (((Item) o).getAddHex().equals(this.addHex))
+				|| (((Item) o).getMinusHex().equals(this.minusHex));
 	}
 
 	@Override

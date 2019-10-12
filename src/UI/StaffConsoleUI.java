@@ -33,7 +33,7 @@ public class StaffConsoleUI implements UIFrame{
 		frameComponents.add(new Button("Logout", 650, 35, 80, 20, "Logout", "Click Logout"));
 
 		frameComponents.add(new Label("QR Code Label", 50, 125, "QR Code:"));
-		frameComponents.add(new TextField("QR Code", 150, 125, "QR Code"));
+		frameComponents.add(new TextField("QR Code", 150, 125, "QR Code", 300, false));
 		frameComponents.add(new Button("Click Check Item", 140, 260, 0, 0, "Check Student", "Click Check Item"));
 
 		if (!search) {
@@ -66,35 +66,32 @@ public class StaffConsoleUI implements UIFrame{
 	}
 
 	private void displayInfo() {
-		if (!search) {
-			ArrayList<Transaction> listOfTransaction = Metadata.readTransactionMeta();
-			if (listOfTransaction != null) {
-				for (int i = page*10; i < listOfTransaction.size(); i++) {
-					if (i >= 10 * page && i < 10 * (page+1)) {
-						Transaction transIndex = listOfTransaction.get(i);
-						frameComponents.add(new Shape("SQUARE", Color.BLACK, 30, 225 + (i%10 * 20) , 700, 18, false));
-						frameComponents.add(new Label("Tranasction ID " + i, 25, 220 + (i%10 *20), Integer.toString(transIndex.getId())));
-						frameComponents.add(new Label("Modifier " + i, 150, 220 + (i%10 *20), transIndex.getModifier()));
-						frameComponents.add(new Label("Item " + i, 225, 220 + (i%10 *20), transIndex.getItemName()));
-						frameComponents.add(new Label("Description " + i, 375, 220 + (i%10 *20), transIndex.getDescription()));
-						frameComponents.add(new Label("Rented Date " + i, 550, 220 + (i%10 *20), transIndex.getDate()));		
-					}
+		ArrayList<Transaction> listOfTransaction = Metadata.readTransactionMeta();
+		if (listOfTransaction != null) {
+			for (int i = page*10; i < listOfTransaction.size(); i++) {
+				if (i >= 10 * page && i < 10 * (page+1)) {
+					Transaction transIndex = listOfTransaction.get(i);
+					frameComponents.add(new Shape("SQUARE", Color.BLACK, 30, 225 + (i%10 * 20) , 700, 18, false));
+					frameComponents.add(new Label("Tranasction ID " + i, 25, 220 + (i%10 *20), Integer.toString(transIndex.getId())));
+					frameComponents.add(new Label("Modifier " + i, 150, 220 + (i%10 *20), transIndex.getModifier()));
+					frameComponents.add(new Label("Item " + i, 225, 220 + (i%10 *20), transIndex.getItemName()));
+					frameComponents.add(new Label("Description " + i, 375, 220 + (i%10 *20), transIndex.getDescription()));
+					frameComponents.add(new Label("Rented Date " + i, 550, 220 + (i%10 *20), transIndex.getDate()));		
 				}
-				if ((page+1)*10 < listOfTransaction.size()) frameComponents.add(new Button("Next Page", 700, 435, 25, 25, ">", "Click Next Page"));
-			} else {
-				ArrayList<Item> listOfItems = Metadata.readItemMeta();
-				if (listOfItems != null) {
-					for (int i = 0; i < listOfItems.size(); i++) {
-						frameComponents.add(new Shape("SQUARE", Color.BLACK, 30, 225 + (i * 20) , 700, 18, false));
-						frameComponents.add(new Label("Amount " + i, 25, 220 + (i*20), Integer.toString(listOfItems.get(i).getAmount())));
-						frameComponents.add(new Label("Item " + i, 125, 220 + (i*20), listOfItems.get(i).getItemName()));
-						frameComponents.add(new Label("Description " + i, 300, 220 + (i*20), listOfItems.get(i).getDescription()));
-					}
-				}
-				if ((page+1)*10 < listOfItems.size()) frameComponents.add(new Button("Next Page", 700, 435, 25, 25, ">", "Click Next Page"));
 			}
+			if ((page+1)*10 < listOfTransaction.size()) frameComponents.add(new Button("Next Page", 700, 435, 25, 25, ">", "Click Next Page"));
+		} else {
+			ArrayList<Item> listOfItems = Metadata.readItemMeta();
+			if (listOfItems != null) {
+				for (int i = 0; i < listOfItems.size(); i++) {
+					frameComponents.add(new Shape("SQUARE", Color.BLACK, 30, 225 + (i * 20) , 700, 18, false));
+					frameComponents.add(new Label("Amount " + i, 25, 220 + (i*20), Integer.toString(listOfItems.get(i).getAmount())));
+					frameComponents.add(new Label("Item " + i, 125, 220 + (i*20), listOfItems.get(i).getItemName()));
+					frameComponents.add(new Label("Description " + i, 300, 220 + (i*20), listOfItems.get(i).getDescription()));
+				}
+			}
+			if ((page+1)*10 < listOfItems.size()) frameComponents.add(new Button("Next Page", 700, 435, 25, 25, ">", "Click Next Page"));
 		}
-
 		if (page != 0) frameComponents.add(new Button("Back Page", 600, 435, 25, 25, "<", "Click Back Page"));
 	}
 
@@ -140,11 +137,11 @@ public class StaffConsoleUI implements UIFrame{
 				}  else if (splitAction[1].equals("Print")) {
 					if (splitAction[2].equals("Inventory")) {
 						Metadata.compileInventory(sort);
-						frameComponents.alertUser("Item Log", 200, 300, "Inventory log has been compiled in the Inventory folder", "Item Log", false);
+						frameComponents.alertUser("Item Log", 200, 300, "Inventory log has been compiled in the Inventory folder", "Item Log", "confirm");
 						frameComponents.setFocus("Item Log");
 					} else if (splitAction[2].equals("Transaction")) {
 						Metadata.compileTransaction();
-						frameComponents.alertUser("Transaction Log", 200, 300, "Transaction log has been compiled into Transaction_log.png", "Transaction Log", false);
+						frameComponents.alertUser("Transaction Log", 200, 300, "Transaction log has been compiled into Transaction_log.png", "Transaction Log", "confirm");
 						frameComponents.setFocus("Transaction Log");
 					}
 				} else if (splitAction[1].equals("Search")) {
@@ -179,13 +176,13 @@ public class StaffConsoleUI implements UIFrame{
 								refreshFrame();
 								return null;
 							} else {
-								frameComponents.alertUser("Item Insufficient", 200, 300, "There are no more " + getItem.getDescription() + " " + getItem.getItemName() + " in stock", "Item not in stock", false);
+								frameComponents.alertUser("Item Insufficient", 200, 300, "There are no more " + getItem.getDescription() + " " + getItem.getItemName() + " in stock", "Item not in stock", "confirm");
 								frameComponents.setFocus("Item Insufficient");
 								return null;						
 							}
 						} else 
 						{
-							frameComponents.alertUser("Confirm transaction", 200, 300, "Item does not exist", "Item does not exist", false);
+							frameComponents.alertUser("Confirm transaction", 200, 300, "Item does not exist", "Item does not exist", "confirm");
 							frameComponents.setFocus("Confirm transaction");
 							return null;						
 						}
